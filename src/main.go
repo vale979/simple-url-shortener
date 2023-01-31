@@ -19,6 +19,9 @@ var redis_address = "localhost:6379"
 var redis_pwd = os.Getenv("REDIS_PWD")
 //var redis_pwd = ""
 
+var minUrlLength = 5
+var maxUrlLength = 13
+
 var client = redis.NewClient(&redis.Options{
   Addr     : redis_address,
   Password : redis_pwd,
@@ -75,7 +78,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request){
   if validateUrl(url) {
     // give shortened url
     for true {
-      short_key = get_string(5,13)
+      short_key = getString(minUrlLength, maxUrlLength)
       _, err := client.Get(short_key).Result()
       if err == redis.Nil{
         // If the key does not already exist, use the key
@@ -109,7 +112,7 @@ func linkHandler(w http.ResponseWriter, r *http.Request){
 }
 
 
-func get_string(minLength, maxLength int) string {
+func getString(minLength, maxLength int) string {
   const seedBytes = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ023579_-"
   var src = rand.NewSource(time.Now().UnixNano())
   const (
